@@ -187,7 +187,7 @@ list[map[str, value]] performBenchmark(map[str, value] parsed, map[str, map[str,
 					sourceCode = cast(#str, snippetInfo["adjusted_source"]);
 				}
 				int classificationCode = cast(#int, snippetInfo["classification"]);
-				if (classificationCode >= 0) {
+				if (classificationCode >= 0 || useToplevel) {
 					if (useToplevel) {
 						snippet["benchmark"] = executeBenchmark(
 								sourceCode, rounds, countAmbiguity,
@@ -226,7 +226,7 @@ list[map[str, value]] performBenchmark(map[str, value] parsed, map[str, map[str,
 }
 
 
-void main(str source = "", str target = "", str repo = "", int rounds = 5, bool countAmbiguity = true, bool useToplevel = false) {
+void main(str source = "", str target = "", str repo = "", int rounds = 5, bool countAmbiguity = true, bool useToplevel = true) {
 	if (source == "" || target == "" || repo == "") {
 		return;
 	}
