@@ -454,13 +454,6 @@ void makeGrammar() {
 	'	}
 	'}
 	'
-	'bool anyTrue(list[bool] xs) {
-	'	for (x \<- xs) {
-	'		if (x) { return true; }
-	'	}
-	'	return false;
-	'}
-	'
 	'bool usesCustomNonterminal(value tree) {
 	'	booleans = [];	
 	'	visit(tree) {
@@ -479,14 +472,29 @@ void makeGrammar() {
 	'
 	'<intercalate("\n", parseFunctions)>
 	'
-	'int getClassification(str snippet) {
+	'int fixEmpty(int n) {
+	'	if (n == getNonterminalNumber(\"EmptyModule\")) {
+	'		return getNonterminalNumber(\"Comment_LEX\");
+	'	}
+	'	return n;
+	'}
+	'
+	'
+	'tuple[int, tree] getClassification(str snippet) {
+	'	bool isEmpty = false;
+	'	if (/[\\t-\\n \\a0C-\\a0D \\ ]*/ := snippet) {
+	'		isEmpty = true;
+	'	}
 	'	try {
 	'		tree = parse(#start[UltimateTopLevel], snippet, allowAmbiguity=true);
+	'		if (isEmpty) {
+	'			return [getNonterminalNumber(\"EmptyModule\"), tree];
+	'		}
 	'		if (appl(prod(_, [\\sort(str x)], _), _) := tree.top) {
-	'			return getNonterminalNumber(x);
+	'			return [fixEmpty(getNonterminalNumber(x)), tree];
 	'		}
 	'		if (appl(prod(_, [\\lex(str x)], _), _) := tree.top) {
-	'			return getNonterminalNumber(x);
+	'			return [fixEmpty(getNonterminalNumber(x)), tree];
 	'		}
 	'		if (amb(alternatives) := tree.top) {
 	'			int minPriority = getMaxIndex() + 1;
@@ -505,10 +513,10 @@ void makeGrammar() {
 	'					throw \"Fatal error [bug]: Could not extract rule\";
 	'				}
 	'			}
-	'			return minPriority;
+	'			return [fixEmpty(minPriority), tree];
 	'		}
 	'	} catch ParseError(loc l): {
-	'		return -1;
+	'		return [-1, amb({})];
 	'	}
 	'	throw \"Fatal error [bug]: Could not find classification\";
 	'}
