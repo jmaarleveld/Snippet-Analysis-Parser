@@ -71,10 +71,7 @@ syntax HangingBracket = "{" | "}";
 // Allow incomplete blocks
 syntax DanglingBlock = "{" BlockStm*; //  EndOfFile;
 syntax HangingStatement = EndOfFile >> LAYOUT* !>> ![];
-syntax Stm 
-	= DanglingBlock
-	| HangingStatement 				// Capture while (condition) EOF 
-	; 
+syntax Stm = HangingStatement;
 syntax Block = DanglingBlock;	// Check effectiveness
 
 // Allow incomplete switch blocks
@@ -480,21 +477,21 @@ void makeGrammar() {
 	'}
 	'
 	'
-	'tuple[int, tree] getClassification(str snippet) {
+	'tuple[int, Tree] getClassification(str snippet) {
 	'	bool isEmpty = false;
-	'	if (/[\\t-\\n \\a0C-\\a0D \\ ]*/ := snippet) {
+	'	if (/^\\s*$/ := snippet) {
 	'		isEmpty = true;
 	'	}
 	'	try {
 	'		tree = parse(#start[UltimateTopLevel], snippet, allowAmbiguity=true);
 	'		if (isEmpty) {
-	'			return [getNonterminalNumber(\"EmptyModule\"), tree];
+	'			return \<getNonterminalNumber(\"EmptyModule\"), tree\>;
 	'		}
 	'		if (appl(prod(_, [\\sort(str x)], _), _) := tree.top) {
-	'			return [fixEmpty(getNonterminalNumber(x)), tree];
+	'			return \<fixEmpty(getNonterminalNumber(x)), tree\>;
 	'		}
 	'		if (appl(prod(_, [\\lex(str x)], _), _) := tree.top) {
-	'			return [fixEmpty(getNonterminalNumber(x)), tree];
+	'			return \<fixEmpty(getNonterminalNumber(x)), tree\>;
 	'		}
 	'		if (amb(alternatives) := tree.top) {
 	'			int minPriority = getMaxIndex() + 1;
@@ -513,10 +510,10 @@ void makeGrammar() {
 	'					throw \"Fatal error [bug]: Could not extract rule\";
 	'				}
 	'			}
-	'			return [fixEmpty(minPriority), tree];
+	'			return \<fixEmpty(minPriority), tree\>;
 	'		}
 	'	} catch ParseError(loc l): {
-	'		return [-1, amb({})];
+	'		return \<-1, amb({})\>;
 	'	}
 	'	throw \"Fatal error [bug]: Could not find classification\";
 	'}

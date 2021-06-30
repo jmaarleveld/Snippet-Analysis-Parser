@@ -71,10 +71,7 @@ syntax HangingBracket = "{" | "}";
 // Allow incomplete blocks
 syntax DanglingBlock = "{" BlockStm*; //  EndOfFile;
 syntax HangingStatement = EndOfFile >> LAYOUT* !>> ![];
-syntax Stm 
-	= DanglingBlock
-	| HangingStatement 				// Capture while (condition) EOF 
-	; 
+syntax Stm = HangingStatement;
 syntax Block = DanglingBlock;	// Check effectiveness
 
 // Allow incomplete switch blocks
